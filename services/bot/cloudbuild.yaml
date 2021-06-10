@@ -1,0 +1,27 @@
+steps:
+  - name: "docker"
+    args: [
+        "build",
+        "-t",
+        "us.gcr.io/$PROJECT_ID/godz-bot_api",
+        "/workspace/services/bot",
+      ] #/workspace defines the root folder of the git repo
+  - name: "docker"
+    args: ["push", "us.gcr.io/$PROJECT_ID/godz-bot_api"]
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      [
+        "run",
+        "deploy",
+        "godz-bot",
+        "--image",
+        "us.gcr.io/$PROJECT_ID/godz-bot_api",
+        "--region",
+        "us-east1",
+        "--platform",
+        "managed",
+        "--add-cloudsql-instances",
+        "godzilliqa:us-east1:godz-gdsj",
+      ]
+images: ["us.gcr.io/$PROJECT_ID/godz-bot_api"]

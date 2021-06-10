@@ -1,0 +1,7 @@
+Dockerfile
+README.md
+*.py[cod]
+__pycache__
+.mypy_cache/
+.idea/
+.vscode/

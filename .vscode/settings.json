@@ -1,0 +1,12 @@
+{
+    "python.pythonPath": "/Users/steven/.local/share/virtualenvs/bot-MT3BYfWD/bin/python",
+    "python.linting.pylintEnabled": false,
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": false,
+    "python.analysis.disabled": [
+        //       "unresolved-import"
+    ],
+    "python.languageServer": "Pylance",
+    "python.formatting.provider": "black"
+}

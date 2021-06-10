@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.idea/
+.vscode/
+docker-compose.yml
+.env.prod

@@ -1,0 +1,25 @@
+steps:
+  - name: "docker"
+    args: [
+        "build",
+        "-t",
+        "us.gcr.io/$PROJECT_ID/godz-web_api",
+        "/workspace/services/web",
+      ] #/workspace defines the root folder of the git repo
+  - name: "docker"
+    args: ["push", "us.gcr.io/$PROJECT_ID/godz-web_api"]
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      [
+        "run",
+        "deploy",
+        "godz-web",
+        "--image",
+        "us.gcr.io/$PROJECT_ID/godz-web_api",
+        "--region",
+        "us-east1",
+        "--platform",
+        "managed",
+      ]
+images: ["us.gcr.io/$PROJECT_ID/godz-web_api"]
