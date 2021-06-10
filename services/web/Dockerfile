@@ -10,11 +10,12 @@ ENV PYTHONPATH=$PYTHONPATH:$APP_HOME
 COPY Pipfile .
 COPY Pipfile.lock .
 RUN pipenv install --deploy --ignore-pipfile
-ENV PATH=/root/.local/share/virtualenvs/web-ijJmU-Nl/bin:$PATH
+ENV PATH=/root/.local/share/virtualenvs/bot-Z2emI11w/bin:$PATH
 
 # Copy utility files
 COPY .env .
 COPY alembic.ini .
+
 
 # Copy over bash file
 COPY startup.sh .

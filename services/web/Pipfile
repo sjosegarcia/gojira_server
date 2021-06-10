@@ -4,22 +4,29 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-alembic = ">=1.5.8"
-fastapi = ">=0.63.0"
+python-telegram-bot = ">=13.4.1"
+orjson = ">=3.5.1"
+pydantic =  {extras = ["dotenv"], versions = ">=1.8.1"}
+mypy = ">=0.812"
+httpx = ">=0.17.1"
+google-cloud-secret-manager = ">=2.4.0"
 debugpy = ">=v1.0.0rc2"
+fastapi = ">=0.63.0"
 uvicorn = {extras = ["standard"], versions = ">=0.13.4"}
 gunicorn = ">=20.1.0"
-orjson = ">=3.5.1"
-httpx = ">=0.17.1"
-asyncpraw = ">=7.2.0"
-mypy = ">=0.812"
+itsdangerous = ">=1.1.0"
+loguru = ">=0.5.3"
+psycopg2 = ">=2.8.6"
+asyncpg = ">=0.22.0"
+alembic = ">=1.6.2"
 sqlalchemy = {extras = ["mypy"], versions = ">=1.4.4"}
 sqlalchemy-stubs = ">=0.4"
 sqlalchemy2-stubs = ">=0.0.1a4"
-psycopg2 = ">=2.8.6"
-asyncpg = ">=0.22.0"
-itsdangerous = ">=1.1.0"
-
+dependency-injector = ">=4.32.0"
+urlextract = ">=1.2.0"
+pytest = ">=6.2.3"
+pytest-asyncio = ">=0.15.1"
+telethon = ">=1.21.1"
 
 [dev-packages]
 flake8 = ">=3.9.0"

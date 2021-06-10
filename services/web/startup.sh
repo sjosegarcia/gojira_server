@@ -1,8 +1,8 @@
 #!/bin/bash
-#alembic upgrade head
+alembic upgrade head
 if [ "$PRODUCTION" = true ]; then
 source .env
-gunicorn bin.setup:setup_app -w 4 -k uvicorn.workers.UvicornWorker -b $SERVER_HOST:$SERVER_PORT
+gunicorn setup.start_app:start_app -t 0 -w 1 -k uvicorn.workers.UvicornWorker -b $HOST:$PORT --threads 8 --log-level debug --forwarded-allow-ips="*"
 else
-python -m debugpy --wait-for-client --listen $SERVER_HOST:5678 -m uvicorn --factory bin.setup:setup_app --reload --host $SERVER_HOST --port $SERVER_PORT --lifespan on --log-level debug
+python -m debugpy --wait-for-client --listen $HOST:5678 -m uvicorn --factory setup.start_app:start_app --reload --host $HOST --port $PORT --lifespan on --log-level debug --forwarded-allow-ips '*' --workers 1
 fi

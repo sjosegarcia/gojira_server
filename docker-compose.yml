@@ -26,7 +26,9 @@ services:
   api-redis:
     image: "redis:alpine"
   api-web:
-    environment:
+    environment: 
+      - PORT=8443
+      - DEBUG=true
       - DATABASE_URL=postgresql+asyncpg://local:local@api-db:5432/test_db
     build:
       context: './services/web/'
@@ -35,25 +37,6 @@ services:
       - ./services/web:/app/web
     env_file:
       - ./services/web/.env
-    ports:
-      - "8080:8080"
-      - "5678:5678"
-    depends_on:
-      - api-db
-      - api-redis
-    restart: always
-  api-bot:
-    environment: 
-      - PORT=8443
-      - DEBUG=true
-      - DATABASE_URL=postgresql+asyncpg://local:local@api-db:5432/test_db
-    build:
-      context: './services/bot/'
-      dockerfile: Dockerfile
-    volumes:
-      - ./services/bot:/app/bot
-    env_file:
-      - ./services/bot/.env
     ports:
       - "8443:8443"
       - "5679:5678"
