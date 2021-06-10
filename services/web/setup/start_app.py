@@ -6,6 +6,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from endpoints.api_endpoints import api_router
 from setup.config import get_settings
 from models.base import Base
+from repositories.database_repository import db
 
 
 def start_app() -> FastAPI:
@@ -18,7 +19,7 @@ def start_app() -> FastAPI:
     )
 
     app.include_router(api_router)
-    # app.add_middleware(SessionMiddleware, secret_key=settings.api_secret_key)
+    app.add_middleware(SessionMiddleware, secret_key=settings.api_secret_key)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -29,7 +30,7 @@ def start_app() -> FastAPI:
 
     @app.on_event("startup")
     async def startup() -> None:
-        async with engine.begin() as conn:
+        async with db.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
     @app.on_event("shutdown")
