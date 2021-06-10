@@ -3,11 +3,11 @@ steps:
     args: [
         "build",
         "-t",
-        "us.gcr.io/$PROJECT_ID/godz-bot_api",
-        "/workspace/services/bot",
+        "us.gcr.io/$PROJECT_ID/goji-web-api",
+        "/workspace/services/web",
       ] #/workspace defines the root folder of the git repo
   - name: "docker"
-    args: ["push", "us.gcr.io/$PROJECT_ID/godz-bot_api"]
+    args: ["push", "us.gcr.io/$PROJECT_ID/goji-web-api"]
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
     args:
@@ -16,7 +16,7 @@ steps:
         "deploy",
         "godz-bot",
         "--image",
-        "us.gcr.io/$PROJECT_ID/godz-bot_api",
+        "us.gcr.io/$PROJECT_ID/goji-web-api",
         "--region",
         "us-east1",
         "--platform",
@@ -24,4 +24,4 @@ steps:
         "--add-cloudsql-instances",
         "godzilliqa:us-east1:godz-gdsj",
       ]
-images: ["us.gcr.io/$PROJECT_ID/godz-bot_api"]
+images: ["us.gcr.io/$PROJECT_ID/goji-web-api"]

@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from alembic import context
 from sqlalchemy.ext.asyncio.engine import AsyncConnection
 from models.base import Base
-from models.chat_model import ChatModel
 from providers.database_service import create_db_url
 
 # this is the Alembic Config object, which provides
