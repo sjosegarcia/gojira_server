@@ -20,5 +20,21 @@ async def create_user(db: AsyncSession, user: UserSchema) -> User:
 
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User:
-    result = await db.execute(select(User).where(User.email == email))
+    result = await db.execute(
+        select(User).where(User.email == email and User.deleted == False)
+    )
     return result.scalars().first()
+
+
+async def get_user_by_id(db: AsyncSession, id: int) -> User:
+    result = await db.execute(
+        select(User).where(User.id == id and User.deleted == False)
+    )
+    return result.scalars().first()
+
+
+async def delete_user(db: AsyncSession, id: int) -> User:
+    user = await get_user_by_id(db, id)
+    user.deleted = True
+    await db.commit()
+    return user

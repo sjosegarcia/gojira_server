@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from repositories.database_repository import db
 from schema.user_schema import User, UserInDB
 from fastapi.exceptions import HTTPException
-from repositories.user_repository import create_user, get_user_by_email
+from repositories.user_repository import create_user, get_user_by_email, get_user_by_id
+from starlette.requests import Request
 
 users_router = APIRouter()
 
@@ -20,3 +21,12 @@ async def create_new_user(
 
     new_user = create_user(db, user)
     return UserInDB.from_orm(new_user)
+
+
+@users_router.get("/get-user", response_model=UserInDB)
+async def get_user(request: Request, db: AsyncSession = Depends(db.get_db)) -> UserInDB:
+    data = await request.json()
+    user_found = await get_user_by_id(db, data["id"])
+    if not user_found:
+        raise HTTPException(status_code=400, detail="User does not exist.")
+    return UserInDB.from_orm(user_found)
