@@ -7,11 +7,8 @@ from uuid import uuid4
 
 class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    uuid = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4, unique=True, nullable=False
-    )
+    uid = Column(String, default=False, nullable=True)
     username = Column(String, default=False, nullable=True)
-    password = Column(String, nullable=True)
     email = Column(String, default=False, nullable=True)
     firstname = Column(String, default=False, nullable=True)
     lastname = Column(String, default=False, nullable=True)

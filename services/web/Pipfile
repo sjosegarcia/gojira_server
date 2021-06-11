@@ -24,6 +24,7 @@ sqlalchemy2-stubs = ">=0.0.1a4"
 urlextract = ">=1.2.0"
 pytest = ">=6.2.3"
 pytest-asyncio = ">=0.15.1"
+firebase-admin = ">=5.0.0"
 
 [dev-packages]
 flake8 = ">=3.9.0"

@@ -15,12 +15,6 @@ class Settings(BaseSettings):
     host: str
     port: str
 
-    telegram_session_name: str
-    telegram_api_id: str
-    telegram_api_hash: str
-    telegram_bot_webhook_url: str
-    telegram_bot_api_key: str
-
     database_url: str
     database_username: str
     database_password_secret: str
@@ -35,10 +29,6 @@ class Settings(BaseSettings):
     gcp_project_id: str
     gcp_secret_id: str
     gcp_secrets_version_id: str
-
-    zilstream_token_url: str
-
-    cas_api_url: str
 
 
 @lru_cache()
