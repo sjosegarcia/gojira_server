@@ -23,7 +23,7 @@ class Model(BaseModel):
         json_dumps = orjson_dumps
         json_encoders = {UUID: lambda x: pydantic_encoder(x)}
         json_loads = orjson.loads
-        orm_mode = False
+        orm_mode = True
         validate_all = True
         use_enum_values = False
         validate_assignment = True
