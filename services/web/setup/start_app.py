@@ -18,7 +18,7 @@ def start_app() -> FastAPI:
         default_response_class=ORJSONResponse,
     )
 
-    app.include_router(api_router)
+    app.include_router(api_router, prefix=settings.api_v1_str)
     app.add_middleware(SessionMiddleware, secret_key=settings.api_secret_key)
     app.add_middleware(
         CORSMiddleware,

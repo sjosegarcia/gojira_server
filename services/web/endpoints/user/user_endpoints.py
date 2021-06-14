@@ -23,10 +23,30 @@ async def create_new_user(
     return UserInDB.from_orm(new_user)
 
 
-@users_router.get("/get-user", response_model=UserInDB)
-async def get_user(request: Request, db: AsyncSession = Depends(db.get_db)) -> UserInDB:
+@users_router.get("/get-user-id", response_model=UserInDB)
+async def get_user_id(
+    request: Request, db: AsyncSession = Depends(db.get_db)
+) -> UserInDB:
     data = await request.json()
     user_found = await get_user_by_id(db, data["id"])
     if not user_found:
         raise HTTPException(status_code=400, detail="User does not exist.")
     return UserInDB.from_orm(user_found)
+
+
+@users_router.get("/get-user-email", response_model=UserInDB)
+async def get_user_email(
+    request: Request, db: AsyncSession = Depends(db.get_db)
+) -> UserInDB:
+    data = await request.json()
+    user_found = await get_user_by_email(db, data["email"])
+    if not user_found:
+        raise HTTPException(status_code=400, detail="User does not exist.")
+    return UserInDB.from_orm(user_found)
+
+
+@users_router.post("/update-user", response_model=UserInDB)
+async def update_user(
+    request: Request, db: AsyncSession = Depends(db.get_db)
+) -> UserInDB:
+    pass

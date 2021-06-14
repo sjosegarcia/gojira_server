@@ -1,18 +1,11 @@
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from schema.user_schema import User as UserSchema
+from schema.user_schema import User as UserSchema, UserInDB
 from models.user_model import User
 from sqlalchemy import select
 
 
 async def create_user(db: AsyncSession, user: UserSchema) -> User:
-    new_user = User(
-        email=user.email,
-        username=user.username,
-        first_name=user.firstname,
-        last_name=user.lastname,
-        email_verified=False,
-        dob=user.dob,
-    )
+    new_user = User(email_verified=False, **user.dict())
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
@@ -34,7 +27,12 @@ async def get_user_by_id(db: AsyncSession, id: int) -> User:
 
 
 async def delete_user(db: AsyncSession, id: int) -> User:
-    user = await get_user_by_id(db, id)
-    user.deleted = True
-    await db.commit()
-    return user
+    user_found = await get_user_by_id(db, id)
+    if user_found:
+        user_found.deleted = True
+        await db.commit()
+    return user_found
+
+
+async def update_user(db: AsyncSession, old_user: UserInDB) -> User:
+    pass

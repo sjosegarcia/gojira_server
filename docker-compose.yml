@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   api-db:
+    container_name: goji-db
     env_file:
       - ./services/web/.env
     image: postgres:alpine
@@ -14,7 +15,7 @@ services:
       - ./services/db:/app/db
     restart: always
   api-pgadmin:
-    container_name: pgadmin
+    container_name: goji-pgadmin
     image: dpage/pgadmin4:latest
     environment:
       - PGADMIN_DEFAULT_EMAIL=godzilliqa@godz.io
@@ -24,10 +25,12 @@ services:
     depends_on:
       - api-db
   api-redis:
+    container_name: goji-redis
     image: "redis:alpine"
   api-web:
+    container_name: goji-web
     environment: 
-      - PORT=8443
+      - PORT=8080
       - DEBUG=true
       - DATABASE_URL=postgresql+asyncpg://local:local@api-db:5432/test_db
     build:
@@ -38,7 +41,7 @@ services:
     env_file:
       - ./services/web/.env
     ports:
-      - "8443:8443"
+      - "8080:8080"
       - "5679:5678"
     depends_on:
       - api-db
