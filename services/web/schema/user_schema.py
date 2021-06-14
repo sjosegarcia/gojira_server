@@ -4,13 +4,13 @@ from typing import Optional
 
 
 class User(Model):
-    uid: str
+    uid: Optional[str]
     username: Optional[str]
-    email: str
-    firstname: str
-    lastname: str
+    email: Optional[str]
+    firstname: Optional[str]
+    lastname: Optional[str]
     dob: Optional[date]
-    is_active: bool
+    role: str
     last_login_date: Optional[datetime]
     created_on: datetime
     updated_on: datetime

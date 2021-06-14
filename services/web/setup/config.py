@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     gcp_project_id: str
     gcp_secret_id: str
     gcp_secrets_version_id: str
+    google_service_account_key_path: str
 
 
 @lru_cache()

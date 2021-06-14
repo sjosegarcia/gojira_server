@@ -11,6 +11,7 @@ class User(Base):
     firstname = Column(String, default=False, nullable=True)
     lastname = Column(String, default=False, nullable=True)
     dob = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    role = Column(String, nullable=False, default="USER")
     last_login_date = Column(DateTime(timezone=True), nullable=True)
     photo_url = Column(String, nullable=True)
     email_verified = Column(Boolean, default=False)
