@@ -1,4 +1,4 @@
-from repositories.firebase_repository import verify_id_token
+from repositories.firebase_repository import get_current_active_user, verify_id_token
 from fastapi.routing import APIRouter
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,11 +38,15 @@ async def get_user_id(user_id: int, db: AsyncSession = Depends(db.get_db)) -> Us
     return UserInDB.from_orm(user_found)
 
 
-@users_router.post("/user/update", response_model=UserInDB)
+@users_router.post("/user/me/update", response_model=UserInDB)
 async def update_user(
-    request: Request, db: AsyncSession = Depends(db.get_db)
+    request: Request, current_user: UserInDB = Depends(get_current_active_user)
 ) -> UserInDB:
-    pass
+    data = await request.json()
+    print(current_user.dict())
+    new_user = current_user.copy(update=data)
+    print(new_user.dict())
+    return new_user
 
 
 @users_router.delete("/user/delete/{user_id}", response_model=UserInDB)
@@ -55,12 +59,8 @@ async def delete_user_by_id(
     return UserInDB.from_orm(user_deleted)
 
 
-@users_router.get("/user/verify-id-token/{id_token}", response_model=UserInDB)
-async def verify_id_token_endpoint(
-    id_token: str, db: AsyncSession = Depends(db.get_db)
+@users_router.get("/user/me", response_model=UserInDB)
+async def get_authenticated_user(
+    current_user: UserInDB = Depends(get_current_active_user),
 ) -> UserInDB:
-    uid = verify_id_token(id_token)
-    user_found = await get_user_by_uid(db, uid)
-    if not user_found:
-        raise HTTPException(status_code=400, detail="User does not exist.")
-    return UserInDB.from_orm(user_found)
+    return current_user

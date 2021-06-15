@@ -1,4 +1,5 @@
 # mypy: ignore-errors
+from repositories.firebase_repository import init_sdk_with_service_account
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,6 +28,7 @@ def start_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    init_sdk_with_service_account()
 
     @app.on_event("startup")
     async def startup() -> None:

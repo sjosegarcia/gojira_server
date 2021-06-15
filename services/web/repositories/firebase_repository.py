@@ -1,15 +1,27 @@
+from fastapi.param_functions import Header, Security
+from repositories.user_repository import get_user_by_uid
 from firebase_admin import credentials, exceptions, auth, initialize_app
+from sqlalchemy.ext.asyncio.session import AsyncSession
 from setup.config import get_settings
 from firebase_admin.auth import UserRecord
 from datetime import timedelta, datetime
 from time import time
 from fastapi.responses import ORJSONResponse
 from fastapi.exceptions import HTTPException
+from fastapi import Depends, status
+from schema.user_schema import UserInDB
+from repositories.database_repository import db
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl=f"{get_settings().api_v1_str}/authentication/token",
+    scopes={"me": "Read information about the current user."},
+)
 
 
 def init_sdk_with_service_account() -> None:
-    cred = credentials.Certificate(get_settings().google_service_account_key_path)
-    default_app = initialize_app(cred)
+    cred = credentials.Certificate(get_settings().gcp_service_account_key_path)
+    initialize_app(cred)
 
 
 def get_user(uid: str) -> UserRecord:
@@ -53,11 +65,43 @@ def check_auth_time(id_token: str) -> ORJSONResponse:
                 httponly=True,
                 secure=True,
             )
+
         # User did not sign in recently. To guard against ID token theft, require
         # re-authentication.
-        HTTPException(status_code=401, detail="Need to sign in again")
+        # raise HTTPException(status_code=401, detail="Need to sign in again")
     except auth.InvalidIdTokenError:
-        HTTPException(status_code=401, detail="Invalid ID token")
+        raise HTTPException(status_code=401, detail="Invalid ID token")
     except exceptions.FirebaseError:
-        HTTPException(status_code=401, detail="Failed to create a session cookie")
+        raise HTTPException(status_code=401, detail="Failed to create a session cookie")
     return response
+
+
+async def get_current_user(
+    authorization: str = Header(None),
+    db: AsyncSession = Depends(db.get_db),
+) -> UserInDB:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        id_token = authorization.split(" ")[1]
+        if not id_token:
+            raise HTTPException(status_code=401, detail=f"Could not grab id token")
+        uid = verify_id_token(id_token)
+    except (auth.RevokedIdTokenError, auth.InvalidIdTokenError):
+        raise credentials_exception
+    user_in_db = await get_user_by_uid(db, uid)
+    if user_in_db is None:
+        raise credentials_exception
+    user = UserInDB.from_orm(user_in_db)
+    return user
+
+
+async def get_current_active_user(
+    current_user: UserInDB = Depends(get_current_user),
+) -> UserInDB:
+    if current_user.deleted:
+        raise HTTPException(status_code=400, detail="This user account is inactive")
+    return current_user

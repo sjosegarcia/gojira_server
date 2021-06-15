@@ -16,6 +16,7 @@ class User(Model):
     updated_on: datetime
     email_verified: bool
     photo_url: Optional[str]
+    deleted: bool
 
 
 class UserInDB(User):
