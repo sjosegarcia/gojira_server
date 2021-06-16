@@ -16,7 +16,7 @@ from starlette.requests import Request
 users_router = APIRouter()
 
 
-@users_router.put("/user/new", response_model=UserInDB)
+@users_router.put("/new", response_model=UserInDB)
 async def create_new_user(
     request: Request, db: AsyncSession = Depends(db.get_db)
 ) -> UserInDB:
@@ -41,7 +41,7 @@ async def create_new_user(
     return user
 
 
-@users_router.get("/user/id/{user_id}", response_model=UserInDB)
+@users_router.get("/id/{user_id}", response_model=UserInDB)
 async def get_user_id(user_id: int, db: AsyncSession = Depends(db.get_db)) -> UserInDB:
     user_found = await get_user_by_id(db, user_id)
     if not user_found:
@@ -49,7 +49,7 @@ async def get_user_id(user_id: int, db: AsyncSession = Depends(db.get_db)) -> Us
     return UserInDB.from_orm(user_found)
 
 
-@users_router.post("/user/me/update", response_model=UserInDB)
+@users_router.post("/me/update", response_model=UserInDB)
 async def update_user(
     request: Request, current_user: UserInDB = Depends(get_current_active_user)
 ) -> UserInDB:
@@ -60,17 +60,18 @@ async def update_user(
     return new_user
 
 
-@users_router.delete("/user/delete/{user_id}", response_model=UserInDB)
+@users_router.delete("/me/delete", response_model=UserInDB)
 async def delete_user_by_id(
-    user_id: int, db: AsyncSession = Depends(db.get_db)
+    current_user: UserInDB = Depends(get_current_active_user),
+    db: AsyncSession = Depends(db.get_db),
 ) -> UserInDB:
-    user_deleted = await delete_user(db, user_id)
+    user_deleted = await delete_user(db, current_user.id)
     if not user_deleted:
         raise HTTPException(status_code=405, detail="User does not exist.")
     return UserInDB.from_orm(user_deleted)
 
 
-@users_router.get("/user/me", response_model=UserInDB)
+@users_router.get("/me", response_model=UserInDB)
 async def get_authenticated_user(
     current_user: UserInDB = Depends(get_current_active_user),
 ) -> UserInDB:
