@@ -10,13 +10,13 @@ class User(Model):
     firstname: Optional[str]
     lastname: Optional[str]
     dob: Optional[date]
-    role: str
+    role: Optional[str]
     last_login_date: Optional[datetime]
-    created_on: datetime
-    updated_on: datetime
-    email_verified: bool
+    created_on: Optional[datetime]
+    updated_on: Optional[datetime]
+    email_verified: Optional[bool]
     photo_url: Optional[str]
-    deleted: bool
+    deleted: Optional[bool]
 
 
 class UserInDB(User):

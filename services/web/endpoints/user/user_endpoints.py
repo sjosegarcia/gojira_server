@@ -10,7 +10,6 @@ from repositories.user_repository import (
     get_user_by_email,
     get_user_by_id,
     delete_user,
-    get_user_by_uid,
 )
 from starlette.requests import Request
 
@@ -19,14 +18,25 @@ users_router = APIRouter()
 
 @users_router.put("/user/new", response_model=UserInDB)
 async def create_new_user(
-    user: User, db: AsyncSession = Depends(db.get_db)
+    request: Request, db: AsyncSession = Depends(db.get_db)
 ) -> UserInDB:
-
-    user_found = await get_user_by_email(db, user.email)
+    data = await request.json()
+    print(data)
+    user_found = await get_user_by_email(db, data["email"])
     if user_found:
         raise HTTPException(status_code=400, detail="User already exist.")
-
-    new_user = create_user(db, user)
+    new_user_schema = User(
+        uid=data.get("uid", ""),
+        username=data.get("username", ""),
+        email=data.get("email", ""),
+        firstname=data.get("firstname", ""),
+        lastname=data.get("lastname", ""),
+        dob=data.get("dob", None),
+        last_login_date=data.get("last_login_date", None),
+        email_verified=data.get("email_verified", False),
+        photo_url=data.get("photo_url", ""),
+    )
+    new_user = await create_user(db, new_user_schema)
     return UserInDB.from_orm(new_user)
 
 

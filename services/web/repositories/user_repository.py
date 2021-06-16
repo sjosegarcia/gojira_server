@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 
 async def create_user(db: AsyncSession, user: UserSchema) -> User:
-    new_user = User(email_verified=False, **user.dict())
+    new_user = User(**user.dict())
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
