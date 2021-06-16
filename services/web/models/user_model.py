@@ -1,3 +1,4 @@
+from sqlalchemy.sql.sqltypes import ARRAY
 from models.base import Base
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime, Integer, Boolean
@@ -11,7 +12,6 @@ class User(Base):
     firstname = Column(String, nullable=True)
     lastname = Column(String, nullable=True)
     dob = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
-    role = Column(String, nullable=False, default="USER")
     last_login_date = Column(DateTime(timezone=True), nullable=True)
     photo_url = Column(String, nullable=True)
     email_verified = Column(Boolean, default=False, nullable=False)

@@ -1,4 +1,4 @@
-from repositories.firebase_repository import get_current_active_user, verify_id_token
+from repositories.firebase_repository import get_current_active_user, apply_custom_claim
 from fastapi.routing import APIRouter
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,23 +21,24 @@ async def create_new_user(
     request: Request, db: AsyncSession = Depends(db.get_db)
 ) -> UserInDB:
     data = await request.json()
-    print(data)
     user_found = await get_user_by_email(db, data["email"])
     if user_found:
         raise HTTPException(status_code=400, detail="User already exist.")
     new_user_schema = User(
-        uid=data.get("uid", ""),
-        username=data.get("username", ""),
-        email=data.get("email", ""),
-        firstname=data.get("firstname", ""),
-        lastname=data.get("lastname", ""),
+        uid=data.get("uid", None),
+        username=data.get("username", None),
+        email=data.get("email", None),
+        firstname=data.get("firstname", None),
+        lastname=data.get("lastname", None),
         dob=data.get("dob", None),
         last_login_date=data.get("last_login_date", None),
         email_verified=data.get("email_verified", False),
-        photo_url=data.get("photo_url", ""),
+        photo_url=data.get("photo_url", None),
     )
     new_user = await create_user(db, new_user_schema)
-    return UserInDB.from_orm(new_user)
+    user = UserInDB.from_orm(new_user)
+    apply_custom_claim(user.uid, {"scopes": ["me"]})
+    return user
 
 
 @users_router.get("/user/id/{user_id}", response_model=UserInDB)

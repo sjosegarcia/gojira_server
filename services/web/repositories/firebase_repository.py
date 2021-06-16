@@ -11,12 +11,7 @@ from fastapi.exceptions import HTTPException
 from fastapi import Depends, status
 from schema.user_schema import UserInDB
 from repositories.database_repository import db
-from fastapi.security import OAuth2PasswordBearer
-
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl=f"{get_settings().api_v1_str}/authentication/token",
-    scopes={"me": "Read information about the current user."},
-)
+from fastapi.security import SecurityScopes
 
 
 def init_sdk_with_service_account() -> None:
@@ -32,19 +27,19 @@ def delete_user(uid: str) -> None:
     auth.delete_user(uid)
 
 
-def verify_id_token(id_token: str) -> str:
+def verify_id_token(id_token: str) -> dict:
     try:
-        # Verify the ID token while checking if the token is revoked by
-        # passing check_revoked=True.
         decoded_token = auth.verify_id_token(id_token, check_revoked=True)
-        # Token is valid and not revoked.
-        uid = decoded_token["uid"]
     except auth.RevokedIdTokenError:
         # Token revoked, inform the user to reauthenticate or signOut().
         pass
     except auth.InvalidIdTokenError:
         pass
-    return str(uid)
+    return dict(decoded_token)
+
+
+def apply_custom_claim(uid: str, claims: dict) -> None:
+    auth.set_custom_user_claims(uid, claims)
 
 
 def check_auth_time(id_token: str) -> ORJSONResponse:
@@ -77,30 +72,43 @@ def check_auth_time(id_token: str) -> ORJSONResponse:
 
 
 async def get_current_user(
+    security_scopes: SecurityScopes,
     authorization: str = Header(None),
     db: AsyncSession = Depends(db.get_db),
 ) -> UserInDB:
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+    else:
+        authenticate_value = f"Bearer"
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+        headers={"WWW-Authenticate": authenticate_value},
     )
     try:
         id_token = authorization.split(" ")[1]
         if not id_token:
             raise HTTPException(status_code=401, detail=f"Could not grab id token")
-        uid = verify_id_token(id_token)
+        decoded_token = verify_id_token(id_token)
     except (auth.RevokedIdTokenError, auth.InvalidIdTokenError):
         raise credentials_exception
-    user_in_db = await get_user_by_uid(db, uid)
+    user_in_db = await get_user_by_uid(db, decoded_token["uid"])
     if user_in_db is None:
         raise credentials_exception
     user = UserInDB.from_orm(user_in_db)
+    scopes = list(decoded_token["scopes"])
+    for scope in security_scopes.scopes:
+        if scope not in scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not enough permissions",
+                headers={"WWW-Authenticate": authenticate_value},
+            )
     return user
 
 
 async def get_current_active_user(
-    current_user: UserInDB = Depends(get_current_user),
+    current_user: UserInDB = Security(get_current_user, scopes=["me"]),
 ) -> UserInDB:
     if current_user.deleted:
         raise HTTPException(status_code=400, detail="This user account is inactive")

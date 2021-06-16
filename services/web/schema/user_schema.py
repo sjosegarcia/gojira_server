@@ -10,7 +10,6 @@ class User(Model):
     firstname: Optional[str]
     lastname: Optional[str]
     dob: Optional[date]
-    role: Optional[str]
     last_login_date: Optional[datetime]
     created_on: Optional[datetime]
     updated_on: Optional[datetime]
