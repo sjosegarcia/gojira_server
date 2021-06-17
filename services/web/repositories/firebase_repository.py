@@ -42,6 +42,18 @@ def apply_custom_claim(uid: str, claims: dict) -> None:
     auth.set_custom_user_claims(uid, claims)
 
 
+def add_scope(uid: str, new_scope: str) -> bool:
+    user = get_user(uid)
+    claims = dict(user.custom_claims)
+    scopes = list(claims.get("scopes", None))
+    if scopes:
+        if new_scope in scopes:
+            return True
+        scopes.append(new_scope)
+        return True
+    return False
+
+
 def check_auth_time(id_token: str) -> ORJSONResponse:
     # To ensure that cookies are set only on recently signed in users, check auth_time in
     # ID token before creating a cookie.
