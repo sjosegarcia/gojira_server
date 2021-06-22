@@ -35,3 +35,7 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()
+
+
+def url_slug_regex() -> str:
+    return r"^[a-z0-9]+(?:-[a-z0-9]+)*$"

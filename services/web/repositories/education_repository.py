@@ -36,3 +36,70 @@ async def get_course_by_id(db: AsyncSession, id: int) -> Course:
 async def get_lesson_by_id(db: AsyncSession, id: int) -> Lesson:
     result = await db.execute(select(Lesson).where(Lesson.id == id))
     return result.scalars().first()
+
+
+async def get_section_by_full_slug(
+    db: AsyncSession,
+    program_slug: str,
+    course_slug: str,
+    lesson_slug: str,
+    section_slug: str,
+) -> Section:
+    result = await db.execute(
+        select(Section)
+        .where(Section.slug == section_slug)
+        .join(Lesson)
+        .filter(Lesson.slug == lesson_slug)
+        .join(Course)
+        .filter(Course.slug == course_slug)
+        .join(Program)
+        .filter(Program.slug == program_slug)
+    )
+    return result.scalars().first()
+
+
+async def get_section_by_slug(
+    db: AsyncSession,
+    section_slug: str,
+) -> Section:
+    result = await db.execute(select(Section).where(Section.slug == section_slug))
+    return result.scalars().first()
+
+
+async def get_lesson_by_slug(
+    db: AsyncSession,
+    program_slug: str,
+    course_slug: str,
+    lesson_slug: str,
+) -> Section:
+    result = await db.execute(
+        select(Lesson)
+        .where(Lesson.slug == lesson_slug)
+        .join(Course)
+        .filter(Course.slug == course_slug)
+        .join(Program)
+        .filter(Program.slug == program_slug)
+    )
+    return result.scalars().first()
+
+
+async def get_course_by_slug(
+    db: AsyncSession,
+    program_slug: str,
+    course_slug: str,
+) -> Section:
+    result = await db.execute(
+        select(Course)
+        .where(Course.slug == course_slug)
+        .join(Program)
+        .filter(Program.slug == program_slug)
+    )
+    return result.scalars().first()
+
+
+async def get_program_by_slug(
+    db: AsyncSession,
+    program_slug: str,
+) -> Program:
+    result = await db.execute(select(Program).where(Program.slug == program_slug))
+    return result.scalars().first()

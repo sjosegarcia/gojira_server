@@ -20,6 +20,10 @@ from repositories.education_repository import (
     get_program_by_id,
     get_all_programs,
     create_program,
+    get_section_by_full_slug,
+    get_lesson_by_slug,
+    get_course_by_slug,
+    get_program_by_slug,
 )
 from fastapi.exceptions import HTTPException
 from typing import List
@@ -55,6 +59,74 @@ async def create_program_endpoint(
     program = Program(**data)
     new_program = create_program(db, program)
     return ProgramInDB.from_orm(new_program)
+
+
+@education_router.get(
+    "/{program_slug}/{course_slug}/{lesson_slug}/{section_slug}",
+    response_model=SectionInDB,
+)
+async def get_section_by_url_slug(
+    program_slug: str,
+    course_slug: str,
+    lesson_slug: str,
+    section_slug: str,
+    db: AsyncSession = Depends(db.get_db),
+) -> SectionInDB:
+    section = await get_section_by_full_slug(
+        db, program_slug, course_slug, lesson_slug, section_slug
+    )
+    if not section:
+        raise HTTPException(status_code=404, detail="Section not found.")
+    section_in_db = SectionInDB.from_orm(section)
+    return section_in_db
+
+
+@education_router.get(
+    "/{program_slug}/{course_slug}/{lesson_slug}",
+    response_model=LessonInDB,
+)
+async def get_lesson_by_url_slug(
+    program_slug: str,
+    course_slug: str,
+    lesson_slug: str,
+    db: AsyncSession = Depends(db.get_db),
+) -> LessonInDB:
+    lesson = await get_lesson_by_slug(db, program_slug, course_slug, lesson_slug)
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Lesson not found.")
+    lesson_in_db = LessonInDB.from_orm(lesson)
+    return lesson_in_db
+
+
+@education_router.get(
+    "/{program_slug}/{course_slug}",
+    response_model=LessonInDB,
+)
+async def get_course_by_url_slug(
+    program_slug: str,
+    course_slug: str,
+    db: AsyncSession = Depends(db.get_db),
+) -> CourseInDB:
+    course = await get_course_by_slug(db, program_slug, course_slug)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found.")
+    course_in_db = CourseInDB.from_orm(course)
+    return course_in_db
+
+
+@education_router.get(
+    "/{program_slug}",
+    response_model=ProgramInDB,
+)
+async def get_program_by_url_slug(
+    program_slug: str,
+    db: AsyncSession = Depends(db.get_db),
+) -> ProgramInDB:
+    program = await get_program_by_slug(db, program_slug)
+    if not program:
+        raise HTTPException(status_code=404, detail="Program not found.")
+    program_in_db = ProgramInDB.from_orm(program)
+    return program_in_db
 
 
 @education_router.get("/lesson/{lesson_id}", response_model=LessonInDB)
