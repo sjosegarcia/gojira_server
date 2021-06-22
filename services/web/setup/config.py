@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     gcp_secrets_version_id: str
     gcp_service_account_key_path: str
 
+    redis_url: str
+    redis_password: str
+
 
 @lru_cache()
 def get_settings() -> Settings:

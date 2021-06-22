@@ -27,6 +27,13 @@ services:
   api-redis:
     container_name: goji-redis
     image: "redis:alpine"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    volumes:
+      - ./services/redis:/var/lib/redis
+    command: redis-server --requirepass Y3YjCB-YZJwi
+    ports:
+     - "6379:6379"
   api-web:
     container_name: goji-web
     environment: 

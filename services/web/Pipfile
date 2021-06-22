@@ -26,6 +26,7 @@ pytest = ">=6.2.3"
 pytest-asyncio = ">=0.15.1"
 firebase-admin = ">=5.0.0"
 typer = ">=0.3.2"
+aioredis = {extras = ["hiredis"], versions = ">=2.0.0a1"}
 
 [dev-packages]
 flake8 = ">=3.9.0"
