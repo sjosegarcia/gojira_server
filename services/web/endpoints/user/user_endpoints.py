@@ -1,5 +1,4 @@
 from repositories.firebase_repository import get_current_active_user, apply_custom_claim
-from fastapi.routing import APIRouter
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from repositories.database_repository import db

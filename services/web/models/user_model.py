@@ -1,4 +1,3 @@
-from sqlalchemy.sql.sqltypes import ARRAY
 from models.base import Base
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime, Integer, Boolean
@@ -7,8 +6,8 @@ from sqlalchemy import Column, String, DateTime, Integer, Boolean
 class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     uid = Column(String, nullable=True)
-    username = Column(String, nullable=True)
-    email = Column(String, nullable=True)
+    username = Column(String, nullable=True, unique=True)
+    email = Column(String, nullable=True, unique=True)
     firstname = Column(String, nullable=True)
     lastname = Column(String, nullable=True)
     dob = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)

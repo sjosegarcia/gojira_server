@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 from fastapi.param_functions import Header, Security
 from repositories.user_repository import get_user_by_uid
 from firebase_admin import credentials, exceptions, auth, initialize_app
@@ -91,7 +92,7 @@ async def get_current_user(
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
     else:
-        authenticate_value = f"Bearer"
+        authenticate_value = "Bearer"
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -100,7 +101,7 @@ async def get_current_user(
     try:
         id_token = authorization.split(" ")[1]
         if not id_token:
-            raise HTTPException(status_code=401, detail=f"Could not grab id token")
+            raise HTTPException(status_code=401, detail="Could not grab id token")
         decoded_token = verify_id_token(id_token)
     except (auth.RevokedIdTokenError, auth.InvalidIdTokenError):
         raise credentials_exception

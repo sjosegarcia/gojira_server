@@ -14,21 +14,21 @@ async def create_user(db: AsyncSession, user: UserSchema) -> User:
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User:
     result = await db.execute(
-        select(User).where(User.email == email and User.deleted == False)
+        select(User).where(User.email == email and User.deleted is False)
     )
     return result.scalars().first()
 
 
 async def get_user_by_id(db: AsyncSession, id: int) -> User:
     result = await db.execute(
-        select(User).where(User.id == id and User.deleted == False)
+        select(User).where(User.id == id and User.deleted is False)
     )
     return result.scalars().first()
 
 
 async def get_user_by_uid(db: AsyncSession, uid: str) -> User:
     result = await db.execute(
-        select(User).where(User.uid == uid and User.deleted == False)
+        select(User).where(User.uid == uid and User.deleted is False)
     )
     return result.scalars().first()
 
@@ -36,7 +36,7 @@ async def get_user_by_uid(db: AsyncSession, uid: str) -> User:
 async def delete_user(db: AsyncSession, id: int) -> User:
     user_found = await get_user_by_id(db, id)
     if user_found:
-        user_found.deleted = True
+        user_found.deleted = True  # type: ignore
         await db.commit()
     return user_found
 

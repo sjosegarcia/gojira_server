@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from models.education_model import Program
+from models.education_model import Course, Lesson, Program, Section
 from schema.education_schema import Program as ProgramSchema
 from sqlalchemy import select
 
@@ -21,3 +21,18 @@ async def create_program(db: AsyncSession, program: ProgramSchema) -> Program:
     db.add(new_program)
     await db.commit()
     return new_program
+
+
+async def get_section_by_id(db: AsyncSession, id: int) -> Section:
+    result = await db.execute(select(Section).where(Section.id == id))
+    return result.scalars().first()
+
+
+async def get_course_by_id(db: AsyncSession, id: int) -> Course:
+    result = await db.execute(select(Course).where(Course.id == id))
+    return result.scalars().first()
+
+
+async def get_lesson_by_id(db: AsyncSession, id: int) -> Lesson:
+    result = await db.execute(select(Lesson).where(Lesson.id == id))
+    return result.scalars().first()
