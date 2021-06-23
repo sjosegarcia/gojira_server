@@ -1,4 +1,3 @@
-import aioredis
 from aioredis import Redis
 from aioredis.commands import create_redis
 from setup.config import get_settings

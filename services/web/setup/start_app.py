@@ -1,7 +1,4 @@
 # mypy: ignore-errors
-from typing import Any
-from repositories.redis_repository import redis
-from fastapi.params import Depends
 from repositories.firebase_repository import init_sdk_with_service_account
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
@@ -11,7 +8,6 @@ from endpoints.api_endpoints import api_router
 from setup.config import get_settings
 from models.base import Base
 from repositories.database_repository import db
-from aioredis import Redis
 
 
 def start_app() -> FastAPI:

@@ -3,9 +3,6 @@ from fastapi import Depends, Security
 from fastapi.routing import APIRouter
 from schema.education_schema import (
     Program,
-    Section,
-    Course,
-    Lesson,
     ProgramInDB,
     SectionInDB,
     CourseInDB,
@@ -37,7 +34,7 @@ async def get_program_by_id_endpoint(
 ) -> ProgramInDB:
     program_found = await get_program_by_id(db, program_id)
     if program_found:
-        raise HTTPException(status_code=400, detail="Program not found.")
+        raise HTTPException(status_code=404, detail="Program not found.")
     return ProgramInDB.from_orm(program_found)
 
 
@@ -135,7 +132,7 @@ async def get_lesson_by_id_endpoint(
 ) -> LessonInDB:
     lesson_found = await get_lesson_by_id(db, lesson_id)
     if lesson_found:
-        raise HTTPException(status_code=400, detail="Lesson not found.")
+        raise HTTPException(status_code=404, detail="Lesson not found.")
     return LessonInDB.from_orm(lesson_found)
 
 
@@ -145,7 +142,7 @@ async def get_course_by_id_endpoint(
 ) -> CourseInDB:
     course_found = await get_lesson_by_id(db, course_id)
     if course_found:
-        raise HTTPException(status_code=400, detail="Course not found.")
+        raise HTTPException(status_code=404, detail="Course not found.")
     return CourseInDB.from_orm(course_found)
 
 
@@ -155,5 +152,5 @@ async def get_section_by_id_endpoint(
 ) -> SectionInDB:
     section_found = await get_lesson_by_id(db, section_id)
     if section_found:
-        raise HTTPException(status_code=400, detail="Section not found.")
+        raise HTTPException(status_code=404, detail="Section not found.")
     return SectionInDB.from_orm(section_found)
