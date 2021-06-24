@@ -1,30 +1,30 @@
 from .model_schema import Model
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 
 class Section(Model):
     title: str
     slug: str
     body: str
-    likes: int
-    dislikes: int
+    likes: Optional[int]
+    dislikes: Optional[int]
 
 
 class Lesson(Model):
     title: str
     slug: str
     sections: list[Section]
-    likes: int
-    dislikes: int
+    likes: Optional[int]
+    dislikes: Optional[int]
 
 
 class Course(Model):
     title: str
     slug: str
     lessons: list[Lesson]
-    likes: int
-    dislikes: int
+    likes: Optional[int]
+    dislikes: Optional[int]
 
 
 class Program(Model):

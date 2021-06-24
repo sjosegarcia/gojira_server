@@ -1,4 +1,4 @@
-from repositories.firebase_repository import get_current_user
+from services.firebase_service import get_current_user
 from fastapi import Depends, Security
 from fastapi.routing import APIRouter
 from schema.education_schema import (
@@ -10,9 +10,9 @@ from schema.education_schema import (
 )
 from schema.user_schema import UserInDB
 from sqlalchemy.ext.asyncio import AsyncSession
-from repositories.database_repository import db
+from services.database_service import db
 from starlette.requests import Request
-from repositories.education_repository import (
+from crud.education_crud import (
     get_lesson_by_id,
     get_program_by_id,
     get_all_programs,
@@ -50,11 +50,11 @@ async def get_all_programs_endpoint(
 async def create_program_endpoint(
     request: Request,
     db: AsyncSession = Depends(db.get_db),
-    current_user: UserInDB = Security(get_current_user, scopes=["editor", "admin"]),
+    current_user: UserInDB = Security(get_current_user, scopes=["editor"]),
 ) -> ProgramInDB:
     data = await request.json()
     program = Program(**data)
-    new_program = create_program(db, program)
+    new_program = await create_program(db, program)
     return ProgramInDB.from_orm(new_program)
 
 

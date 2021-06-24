@@ -3,7 +3,7 @@ from aioredis.commands import create_redis
 from setup.config import get_settings
 
 
-class RedisRepository:
+class RedisService:
     async def connect_redis(self) -> None:
         self.redis = await create_redis(
             get_settings().redis_url, password=get_settings().redis_password
@@ -14,4 +14,4 @@ class RedisRepository:
         yield self.redis
 
 
-redis = RedisRepository()
+redis = RedisService()

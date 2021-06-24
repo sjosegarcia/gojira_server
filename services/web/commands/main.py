@@ -1,4 +1,4 @@
-from repositories.firebase_repository import init_sdk_with_service_account, add_scope
+from services.firebase_service import init_sdk_with_service_account, add_scope
 from typer import Typer, echo
 
 typer_app = Typer()

@@ -8,7 +8,7 @@ from loguru import logger
 import os
 
 
-class DatabaseRepository:
+class DatabaseService:
     def __init__(self) -> None:
         self.engine = create_async_engine(create_db_url(), echo=True)
         self.async_session = sessionmaker(
@@ -21,7 +21,7 @@ class DatabaseRepository:
             yield session
         except SQLAlchemyError as error:
             logger.error(f"{error}")
-            session.rollback()
+            await session.rollback()
         finally:
             await session.close()
 
@@ -41,4 +41,4 @@ def create_db_url() -> str:
     return f"postgresql+asyncpg://{settings.database_username}:{get_db_password()}@/{settings.database_name}?host={settings.database_host}:{settings.database_instance}"
 
 
-db = DatabaseRepository()
+db = DatabaseService()

@@ -17,9 +17,33 @@ async def get_all_programs(
 
 
 async def create_program(db: AsyncSession, program: ProgramSchema) -> Program:
-    new_program = Program(**program.dict())
+
+    new_program = Program(title=program.title, slug=program.slug)
     db.add(new_program)
     await db.commit()
+    db.refresh(new_program)
+    new_courses = []
+    new_lessons = []
+    new_sections = []
+    for course in program.courses:
+        new_course = Course(title=course.title, slug=course.slug, program=new_program)
+        new_courses.append(new_course)
+        for lesson in course.lessons:
+            new_lesson = Lesson(title=lesson.title, slug=lesson.slug, course=new_course)
+            new_lessons.append(new_lesson)
+            for section in lesson.sections:
+                new_section = Section(
+                    title=section.title,
+                    slug=section.slug,
+                    body=section.body,
+                    lesson=new_lesson,
+                )
+                new_sections.append(new_section)
+    db.add_all(new_courses)
+    db.add_all(new_lessons)
+    db.add_all(new_sections)
+    await db.commit()
+    db.refresh(new_program)
     return new_program
 
 

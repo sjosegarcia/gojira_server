@@ -1,6 +1,6 @@
 # mypy: ignore-errors
 from fastapi.param_functions import Header, Security
-from repositories.user_repository import get_user_by_uid
+from crud.user_crud import get_user_by_uid
 from firebase_admin import credentials, exceptions, auth, initialize_app
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from setup.config import get_settings
@@ -11,7 +11,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi.exceptions import HTTPException
 from fastapi import Depends, status
 from schema.user_schema import UserInDB
-from repositories.database_repository import db
+from services.database_service import db
 from fastapi.security import SecurityScopes
 
 
@@ -46,11 +46,12 @@ def apply_custom_claim(uid: str, claims: dict) -> None:
 def add_scope(uid: str, new_scope: str) -> bool:
     user = get_user(uid)
     claims = dict(user.custom_claims)
-    scopes = list(claims.get("scopes", None))
+    scopes = claims.get("scopes", [])
     if scopes:
         if new_scope in scopes:
             return True
         scopes.append(new_scope)
+        apply_custom_claim(uid, {"scopes": scopes})
         return True
     return False
 
@@ -101,7 +102,10 @@ async def get_current_user(
     try:
         id_token = authorization.split(" ")[1]
         if not id_token:
-            raise HTTPException(status_code=401, detail="Could not grab id token")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not grab id token",
+            )
         decoded_token = verify_id_token(id_token)
     except (auth.RevokedIdTokenError, auth.InvalidIdTokenError):
         raise credentials_exception
@@ -110,13 +114,14 @@ async def get_current_user(
         raise credentials_exception
     user = UserInDB.from_orm(user_in_db)
     scopes = list(decoded_token["scopes"])
-    for scope in security_scopes.scopes:
-        if scope not in scopes:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Not enough permissions",
-                headers={"WWW-Authenticate": authenticate_value},
-            )
+    if "admin" not in scopes:
+        for scope in security_scopes.scopes:
+            if scope not in scopes:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Not enough permissions",
+                    headers={"WWW-Authenticate": authenticate_value},
+                )
     return user
 
 

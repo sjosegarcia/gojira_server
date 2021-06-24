@@ -1,10 +1,10 @@
-from repositories.firebase_repository import get_current_active_user, apply_custom_claim
+from services.firebase_service import get_current_active_user, apply_custom_claim
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from repositories.database_repository import db
+from services.database_service import db
 from schema.user_schema import User, UserInDB
 from fastapi.exceptions import HTTPException
-from repositories.user_repository import (
+from crud.user_crud import (
     create_user,
     get_user_by_email,
     get_user_by_id,

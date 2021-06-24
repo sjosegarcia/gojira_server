@@ -9,7 +9,7 @@ class Program(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False, unique=True)
     slug = Column(String, nullable=False, unique=True)
-    courses = relationship("Course")
+    courses = relationship("Course", backref="program")
     created_on = Column(
         DateTime(timezone=True), default=datetime.utcnow, nullable=False
     )
@@ -26,7 +26,7 @@ class Course(Base):
     title = Column(String, nullable=False, unique=True)
     slug = Column(String, nullable=False, unique=True)
     program_id = Column(Integer, ForeignKey("program.id"))
-    lessons = relationship("Lesson")
+    lessons = relationship("Lesson", backref="course")
     likes = Column(Integer, nullable=False, default=0)
     dislikes = Column(Integer, nullable=False, default=0)
     created_on = Column(
@@ -45,7 +45,7 @@ class Lesson(Base):
     title = Column(String, nullable=False, unique=True)
     slug = Column(String, nullable=False, unique=True)
     course_id = Column(Integer, ForeignKey("course.id"))
-    sections = relationship("Section")
+    sections = relationship("Section", backref="lesson")
     likes = Column(Integer, nullable=False, default=0)
     dislikes = Column(Integer, nullable=False, default=0)
     created_on = Column(

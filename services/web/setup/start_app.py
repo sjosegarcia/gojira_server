@@ -1,5 +1,5 @@
 # mypy: ignore-errors
-from repositories.firebase_repository import init_sdk_with_service_account
+from services.firebase_service import init_sdk_with_service_account
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,13 +7,13 @@ from starlette.middleware.sessions import SessionMiddleware
 from endpoints.api_endpoints import api_router
 from setup.config import get_settings
 from models.base import Base
-from repositories.database_repository import db
+from services.database_service import db
 
 
 def start_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(
-        debug=settings.debug,
+        debug=bool(settings.debug),
         title=settings.project_name,
         openapi_url=f"{settings.api_v1_str}/openapi.json",
         default_response_class=ORJSONResponse,

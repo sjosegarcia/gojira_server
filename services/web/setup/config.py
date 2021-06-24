@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     project_path: str = os.path.abspath(os.getcwd())
 
     project_name: str
-    debug: bool
+    debug: str
     host: str
     port: str
 
