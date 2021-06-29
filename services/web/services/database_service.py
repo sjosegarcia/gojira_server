@@ -36,8 +36,12 @@ def get_db_password() -> str:
 
 def create_db_url() -> str:
     settings = get_settings()
-    if not os.getenv("PRODUCTION", False):
+    env = os.getenv("ENV", "")
+    if env == "DEV":
         return settings.database_url
+    if os.getenv("ENV", "") == "TEST":
+        return settings.test_database_url
+
     return f"postgresql+asyncpg://{settings.database_username}:{get_db_password()}@/{settings.database_name}?host={settings.database_host}:{settings.database_instance}"
 
 

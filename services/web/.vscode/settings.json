@@ -8,5 +8,17 @@
         //       "unresolved-import"
     ],
     "python.languageServer": "Pylance",
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5434,
+            "driver": "PostgreSQL",
+            "name": "test",
+            "database": "test_db",
+            "username": "test",
+            "password": "test"
+        }
+    ]
 }

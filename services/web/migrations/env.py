@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio.engine import AsyncConnection
 from models.base import Base
 from models.user_model import User
 from models.education_model import Program, Course, Lesson, Section
-from repositories.database_repository import create_db_url
+from services.database_service import create_db_url
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

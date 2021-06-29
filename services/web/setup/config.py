@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     redis_url: str
     redis_password: str
 
+    test_database_url: str
+
 
 @lru_cache()
 def get_settings() -> Settings:

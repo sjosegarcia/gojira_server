@@ -14,6 +14,17 @@ services:
     volumes:
       - ./services/db:/app/db
     restart: always
+  api-test-db:
+    container_name: goji-test-db
+    env_file:
+      - ./services/web/.env
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test_db
+    ports:
+      - "5434:5432"
   api-pgadmin:
     container_name: goji-pgadmin
     image: dpage/pgadmin4:latest
