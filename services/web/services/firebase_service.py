@@ -4,7 +4,7 @@ from crud.user_crud import get_user_by_uid
 from firebase_admin import credentials, exceptions, auth, initialize_app
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from setup.config import get_settings
-from firebase_admin.auth import UserRecord
+from firebase_admin.auth import UserNotFoundError, UserRecord
 from datetime import timedelta, datetime
 from time import time
 from fastapi.responses import ORJSONResponse
@@ -21,11 +21,23 @@ def init_sdk_with_service_account() -> None:
 
 
 def get_user(uid: str) -> UserRecord:
-    return auth.get_user(uid)
+    try:
+        return auth.get_user(uid)
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not find user, User ID could not be found.",
+        )
 
 
 def delete_user(uid: str) -> None:
-    auth.delete_user(uid)
+    try:
+        auth.delete_user(uid)
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not delete user, User ID could not be found.",
+        )
 
 
 def verify_id_token(id_token: str) -> dict:
@@ -33,14 +45,26 @@ def verify_id_token(id_token: str) -> dict:
         decoded_token = auth.verify_id_token(id_token, check_revoked=True)
     except auth.RevokedIdTokenError:
         # Token revoked, inform the user to reauthenticate or signOut().
-        pass
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has been revoked, please sign out and try again.",
+        )
     except auth.InvalidIdTokenError:
-        pass
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Token.",
+        )
     return dict(decoded_token)
 
 
 def apply_custom_claim(uid: str, claims: dict) -> None:
+    # try:
     auth.set_custom_user_claims(uid, claims)
+    # except UserNotFoundError:
+    #    raise HTTPException(
+    #        status_code=status.HTTP_401_UNAUTHORIZED,
+    #        detail="Could not apply claim, User ID could not be found.",
+    #    )
 
 
 def add_scope(uid: str, new_scope: str) -> bool:
@@ -79,9 +103,14 @@ def check_auth_time(id_token: str) -> ORJSONResponse:
         # re-authentication.
         # raise HTTPException(status_code=401, detail="Need to sign in again")
     except auth.InvalidIdTokenError:
-        raise HTTPException(status_code=401, detail="Invalid ID token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid ID token"
+        )
     except exceptions.FirebaseError:
-        raise HTTPException(status_code=401, detail="Failed to create a session cookie")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Failed to create a session cookie",
+        )
     return response
 
 
@@ -129,5 +158,8 @@ async def get_current_active_user(
     current_user: UserInDB = Security(get_current_user, scopes=["me"]),
 ) -> UserInDB:
     if current_user.deleted:
-        raise HTTPException(status_code=400, detail="This user account is inactive")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This user account is inactive",
+        )
     return current_user

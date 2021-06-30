@@ -60,7 +60,7 @@ async def update_user(
 
 
 @users_router.delete("/me/delete", response_model=UserInDB)
-async def delete_user_by_id(
+async def delete_current_user(
     current_user: UserInDB = Depends(get_current_active_user),
     db: AsyncSession = Depends(db.get_db),
 ) -> UserInDB:
