@@ -1,5 +1,5 @@
 from services.firebase_service import get_current_active_user, apply_custom_claim
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from services.database_service import db
 from schema.user_schema import User, UserInDB
@@ -44,7 +44,9 @@ async def create_new_user(
 async def get_user_id(user_id: int, db: AsyncSession = Depends(db.get_db)) -> UserInDB:
     user_found = await get_user_by_id(db, user_id)
     if not user_found:
-        raise HTTPException(status_code=400, detail="User does not exist.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User not found."
+        )
     return UserInDB.from_orm(user_found)
 
 
@@ -66,7 +68,10 @@ async def delete_current_user(
 ) -> UserInDB:
     user_deleted = await delete_user(db, current_user.id)
     if not user_deleted:
-        raise HTTPException(status_code=405, detail="User does not exist.")
+        raise HTTPException(
+            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            detail="User could not be deleted.",
+        )
     return UserInDB.from_orm(user_deleted)
 
 

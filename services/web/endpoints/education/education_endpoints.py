@@ -1,5 +1,5 @@
 from services.firebase_service import get_current_user
-from fastapi import Depends, Security
+from fastapi import Depends, Security, status
 from fastapi.routing import APIRouter
 from schema.education_schema import (
     Program,
@@ -34,7 +34,9 @@ async def get_program_by_id_endpoint(
 ) -> ProgramInDB:
     program_found = await get_program_by_id(db, program_id)
     if program_found:
-        raise HTTPException(status_code=404, detail="Program not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Program not found."
+        )
     return ProgramInDB.from_orm(program_found)
 
 
@@ -73,7 +75,9 @@ async def get_section_by_url_slug(
         db, program_slug, course_slug, lesson_slug, section_slug
     )
     if not section:
-        raise HTTPException(status_code=404, detail="Section not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Section not found."
+        )
     section_in_db = SectionInDB.from_orm(section)
     return section_in_db
 
@@ -90,7 +94,9 @@ async def get_lesson_by_url_slug(
 ) -> LessonInDB:
     lesson = await get_lesson_by_slug(db, program_slug, course_slug, lesson_slug)
     if not lesson:
-        raise HTTPException(status_code=404, detail="Lesson not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found."
+        )
     lesson_in_db = LessonInDB.from_orm(lesson)
     return lesson_in_db
 
@@ -106,7 +112,9 @@ async def get_course_by_url_slug(
 ) -> CourseInDB:
     course = await get_course_by_slug(db, program_slug, course_slug)
     if not course:
-        raise HTTPException(status_code=404, detail="Course not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Course not found."
+        )
     course_in_db = CourseInDB.from_orm(course)
     return course_in_db
 
@@ -121,7 +129,9 @@ async def get_program_by_url_slug(
 ) -> ProgramInDB:
     program = await get_program_by_slug(db, program_slug)
     if not program:
-        raise HTTPException(status_code=404, detail="Program not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Program not found."
+        )
     program_in_db = ProgramInDB.from_orm(program)
     return program_in_db
 
@@ -132,7 +142,9 @@ async def get_lesson_by_id_endpoint(
 ) -> LessonInDB:
     lesson_found = await get_lesson_by_id(db, lesson_id)
     if lesson_found:
-        raise HTTPException(status_code=404, detail="Lesson not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found."
+        )
     return LessonInDB.from_orm(lesson_found)
 
 
@@ -142,7 +154,9 @@ async def get_course_by_id_endpoint(
 ) -> CourseInDB:
     course_found = await get_lesson_by_id(db, course_id)
     if course_found:
-        raise HTTPException(status_code=404, detail="Course not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Course not found."
+        )
     return CourseInDB.from_orm(course_found)
 
 
@@ -152,5 +166,7 @@ async def get_section_by_id_endpoint(
 ) -> SectionInDB:
     section_found = await get_lesson_by_id(db, section_id)
     if section_found:
-        raise HTTPException(status_code=404, detail="Section not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Section not found."
+        )
     return SectionInDB.from_orm(section_found)

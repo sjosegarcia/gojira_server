@@ -10,7 +10,7 @@ import os
 
 class DatabaseService:
     def __init__(self) -> None:
-        self.engine = create_async_engine(create_db_url(), echo=True)
+        self.engine = create_async_engine(create_db_url(), echo=False)
         self.async_session = sessionmaker(
             self.engine, expire_on_commit=False, class_=AsyncSession
         )

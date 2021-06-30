@@ -17,11 +17,10 @@ async def get_all_programs(
 
 
 async def create_program(db: AsyncSession, program: ProgramSchema) -> Program:
-
     new_program = Program(title=program.title, slug=program.slug)
     db.add(new_program)
     await db.commit()
-    db.refresh(new_program)
+    await db.refresh(new_program)
     new_courses = []
     new_lessons = []
     new_sections = []
@@ -43,7 +42,7 @@ async def create_program(db: AsyncSession, program: ProgramSchema) -> Program:
     db.add_all(new_lessons)
     db.add_all(new_sections)
     await db.commit()
-    db.refresh(new_program)
+    await db.refresh(new_program)
     return new_program
 
 
