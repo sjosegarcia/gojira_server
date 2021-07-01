@@ -39,7 +39,7 @@ class SectionInDB(Model):
     slug: str
     body: str
     created_on: datetime
-    update_on: datetime
+    updated_on: datetime
     likes: int
     dislikes: int
 
@@ -50,7 +50,7 @@ class LessonInDB(Model):
     slug: str
     sections: List[SectionInDB]
     created_on: datetime
-    update_on: datetime
+    updated_on: datetime
     likes: int
     dislikes: int
 
@@ -61,7 +61,7 @@ class CourseInDB(Model):
     slug: str
     lessons: List[LessonInDB]
     created_on: datetime
-    update_on: datetime
+    updated_on: datetime
     likes: int
     dislikes: int
 
@@ -72,4 +72,4 @@ class ProgramInDB(Model):
     slug: str
     courses: List[CourseInDB]
     created_on: datetime
-    update_on: datetime
+    updated_on: datetime

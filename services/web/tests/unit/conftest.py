@@ -116,7 +116,7 @@ def test_program_in_db() -> ProgramInDB:
         title="Test Title",
         slug="test-title",
         created_on=datetime.now(),
-        update_on=datetime.now(),
+        updated_on=datetime.now(),
         courses=[
             CourseInDB(
                 id=1,
@@ -125,7 +125,7 @@ def test_program_in_db() -> ProgramInDB:
                 likes=0,
                 dislikes=0,
                 created_on=datetime.now(),
-                update_on=datetime.now(),
+                updated_on=datetime.now(),
                 lessons=[
                     LessonInDB(
                         id=1,
@@ -134,7 +134,7 @@ def test_program_in_db() -> ProgramInDB:
                         likes=0,
                         dislikes=0,
                         created_on=datetime.now(),
-                        update_on=datetime.now(),
+                        updated_on=datetime.now(),
                         sections=[
                             SectionInDB(
                                 id=1,
@@ -144,7 +144,7 @@ def test_program_in_db() -> ProgramInDB:
                                 likes=0,
                                 dislikes=0,
                                 created_on=datetime.now(),
-                                update_on=datetime.now(),
+                                updated_on=datetime.now(),
                             )
                         ],
                     )
@@ -157,7 +157,7 @@ def test_program_in_db() -> ProgramInDB:
                 likes=0,
                 dislikes=0,
                 created_on=datetime.now(),
-                update_on=datetime.now(),
+                updated_on=datetime.now(),
                 lessons=[
                     LessonInDB(
                         id=2,
@@ -166,7 +166,7 @@ def test_program_in_db() -> ProgramInDB:
                         likes=0,
                         dislikes=0,
                         created_on=datetime.now(),
-                        update_on=datetime.now(),
+                        updated_on=datetime.now(),
                         sections=[
                             SectionInDB(
                                 id=2,
@@ -176,7 +176,7 @@ def test_program_in_db() -> ProgramInDB:
                                 likes=0,
                                 dislikes=0,
                                 created_on=datetime.now(),
-                                update_on=datetime.now(),
+                                updated_on=datetime.now(),
                             )
                         ],
                     )

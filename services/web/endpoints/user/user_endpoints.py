@@ -35,9 +35,9 @@ async def create_new_user(
         photo_url=data.get("photo_url", None),
     )
     new_user = await create_user(db, new_user_schema)
-    user = UserInDB.from_orm(new_user)
-    apply_custom_claim(user.uid, {"scopes": ["me"]})
-    return user
+    user_in_db = UserInDB.from_orm(new_user)
+    apply_custom_claim(user_in_db.uid, {"scopes": ["me"]})
+    return user_in_db
 
 
 @users_router.get("/id/{user_id}", response_model=UserInDB)
