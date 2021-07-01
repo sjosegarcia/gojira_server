@@ -89,3 +89,52 @@ async def test_get_program_by_url_slug(
     assert response.status_code == status.HTTP_200_OK
     program_in_db = ProgramInDB(**response.json())
     assert test_program.slug == program_in_db.slug
+
+
+@pytest.mark.asyncio
+async def test_get_program_by_id_endpoint_failed(
+    test_client: AsyncClient, test_program_in_db: ProgramInDB
+) -> None:
+    async with test_client as client:
+        response = await client.get(f"/education/program/2")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_get_section_by_url_slug_failed(
+    test_client: AsyncClient, test_program: Program
+) -> None:
+    async with test_client as client:
+        response = await client.get(
+            f"/education/{test_program.slug}/{test_program.courses[0].slug}/{test_program.courses[0].lessons[0].slug}/123"
+        )
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_get_lesson_by_url_slug_failed(
+    test_client: AsyncClient, test_program: Program
+) -> None:
+    async with test_client as client:
+        response = await client.get(
+            f"/education/{test_program.slug}/{test_program.courses[0].slug}/123"
+        )
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_get_course_by_url_slug_failed(
+    test_client: AsyncClient, test_program: Program
+) -> None:
+    async with test_client as client:
+        response = await client.get(f"/education/{test_program.slug}/123")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_get_program_by_url_slug_failed(
+    test_client: AsyncClient, test_program: Program
+) -> None:
+    async with test_client as client:
+        response = await client.get(f"/education/123")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
