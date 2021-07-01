@@ -132,39 +132,3 @@ async def get_program_by_url_slug(
             status_code=status.HTTP_404_NOT_FOUND, detail="Program not found."
         )
     return ProgramInDB.from_orm(program_found)
-
-
-@education_router.get("/lesson/{lesson_id}", response_model=LessonInDB)
-async def get_lesson_by_id_endpoint(
-    lesson_id: int, db: AsyncSession = Depends(db.get_db)
-) -> LessonInDB:
-    lesson_found = await get_lesson_by_id(db, lesson_id)
-    if not lesson_found:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found."
-        )
-    return LessonInDB.from_orm(lesson_found)
-
-
-@education_router.get("/course/{course_id}", response_model=CourseInDB)
-async def get_course_by_id_endpoint(
-    course_id: int, db: AsyncSession = Depends(db.get_db)
-) -> CourseInDB:
-    course_found = await get_course_by_id(db, course_id)
-    if course_found:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Course not found."
-        )
-    return CourseInDB.from_orm(course_found)
-
-
-@education_router.get("/section/{section_id}", response_model=SectionInDB)
-async def get_section_by_id_endpoint(
-    section_id: int, db: AsyncSession = Depends(db.get_db)
-) -> SectionInDB:
-    section_found = await get_section_by_id(db, section_id)
-    if not section_found:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Section not found."
-        )
-    return SectionInDB.from_orm(section_found)
