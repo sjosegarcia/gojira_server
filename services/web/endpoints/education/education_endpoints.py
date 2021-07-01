@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from services.database_service import db
 from starlette.requests import Request
 from crud.education_crud import (
+    get_course_by_id,
     get_lesson_by_id,
     get_program_by_id,
     get_all_programs,
@@ -21,6 +22,7 @@ from crud.education_crud import (
     get_lesson_by_slug,
     get_course_by_slug,
     get_program_by_slug,
+    get_section_by_id,
 )
 from fastapi.exceptions import HTTPException
 from typing import List
@@ -45,8 +47,7 @@ async def get_all_programs_endpoint(
     db: AsyncSession = Depends(db.get_db),
 ) -> List[ProgramInDB]:
     programs = await get_all_programs(db)
-    programs_list = [ProgramInDB.from_orm(program) for program in programs]
-    return programs_list
+    return [ProgramInDB.from_orm(program) for program in programs]
 
 
 @education_router.post("/program/create", response_model=ProgramInDB)
@@ -58,9 +59,7 @@ async def create_program_endpoint(
     data = await request.json()
     new_program_schema = Program(**data)
     new_program = await create_program(db, new_program_schema)
-
-    program_in_db = ProgramInDB.from_orm(new_program)
-    return program_in_db
+    return ProgramInDB.from_orm(new_program)
 
 
 @education_router.get(
@@ -81,8 +80,7 @@ async def get_section_by_url_slug(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Section not found."
         )
-    section_in_db = SectionInDB.from_orm(section_found)
-    return section_in_db
+    return SectionInDB.from_orm(section_found)
 
 
 @education_router.get(
@@ -100,8 +98,7 @@ async def get_lesson_by_url_slug(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Lesson not found."
         )
-    lesson_in_db = LessonInDB.from_orm(lesson_found)
-    return lesson_in_db
+    return LessonInDB.from_orm(lesson_found)
 
 
 @education_router.get(
@@ -118,8 +115,7 @@ async def get_course_by_url_slug(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Course not found."
         )
-    course_in_db = CourseInDB.from_orm(course_found)
-    return course_in_db
+    return CourseInDB.from_orm(course_found)
 
 
 @education_router.get(
@@ -135,8 +131,7 @@ async def get_program_by_url_slug(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Program not found."
         )
-    program_in_db = ProgramInDB.from_orm(program_found)
-    return program_in_db
+    return ProgramInDB.from_orm(program_found)
 
 
 @education_router.get("/lesson/{lesson_id}", response_model=LessonInDB)
@@ -155,7 +150,7 @@ async def get_lesson_by_id_endpoint(
 async def get_course_by_id_endpoint(
     course_id: int, db: AsyncSession = Depends(db.get_db)
 ) -> CourseInDB:
-    course_found = await get_lesson_by_id(db, course_id)
+    course_found = await get_course_by_id(db, course_id)
     if course_found:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Course not found."
@@ -167,7 +162,7 @@ async def get_course_by_id_endpoint(
 async def get_section_by_id_endpoint(
     section_id: int, db: AsyncSession = Depends(db.get_db)
 ) -> SectionInDB:
-    section_found = await get_lesson_by_id(db, section_id)
+    section_found = await get_section_by_id(db, section_id)
     if not section_found:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Section not found."

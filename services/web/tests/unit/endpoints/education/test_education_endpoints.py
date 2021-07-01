@@ -93,7 +93,7 @@ async def test_get_program_by_url_slug(
 
 @pytest.mark.asyncio
 async def test_get_program_by_id_endpoint_failed(
-    test_client: AsyncClient, test_program_in_db: ProgramInDB
+    test_client: AsyncClient,
 ) -> None:
     async with test_client as client:
         response = await client.get(f"/education/program/2")
@@ -133,7 +133,7 @@ async def test_get_course_by_url_slug_failed(
 
 @pytest.mark.asyncio
 async def test_get_program_by_url_slug_failed(
-    test_client: AsyncClient, test_program: Program
+    test_client: AsyncClient,
 ) -> None:
     async with test_client as client:
         response = await client.get(f"/education/123")
