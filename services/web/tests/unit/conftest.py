@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 from schema.education_schema import (
     Program,
     Course,
@@ -197,8 +196,8 @@ def event_loop(request: SubRequest) -> Generator:
 @pytest.fixture(scope="session")
 async def fastapi_app_mock(test_user_in_db: UserInDB) -> FastAPI:
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(Base.metadata.drop_all)  # type: ignore
+        await conn.run_sync(Base.metadata.create_all)  # type: ignore
     app = start_app()
     app.dependency_overrides[db.get_db] = get_test_db
     app.dependency_overrides[get_current_active_user] = lambda: test_user_in_db
