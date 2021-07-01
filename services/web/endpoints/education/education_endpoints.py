@@ -106,7 +106,7 @@ async def get_lesson_by_url_slug(
 
 @education_router.get(
     "/{program_slug}/{course_slug}",
-    response_model=LessonInDB,
+    response_model=CourseInDB,
 )
 async def get_course_by_url_slug(
     program_slug: str,
