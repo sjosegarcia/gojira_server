@@ -1,5 +1,8 @@
 # mypy: ignore-errors
-from services.firebase_service import init_sdk_with_service_account
+from services.firebase_service import (
+    init_sdk_with_service_account,
+    remove_sdk_with_service_account,
+)
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,6 +40,6 @@ def start_app() -> FastAPI:
 
     @app.on_event("shutdown")
     async def shutdown() -> None:
-        pass
+        remove_sdk_with_service_account()
 
     return app

@@ -9,7 +9,12 @@ from schema.education_schema import (
     SectionInDB,
 )
 from models.base import Base
-from services.firebase_service import get_current_active_user, get_current_user
+from services.firebase_service import (
+    get_current_active_user,
+    get_current_user,
+    init_sdk_with_service_account,
+    remove_sdk_with_service_account,
+)
 import pytest
 import os
 from setup.config import get_settings

@@ -9,7 +9,7 @@ from fastapi import status
 async def test_create_new_user(
     test_client: AsyncClient, test_user: User, mocker: MockerFixture
 ) -> None:
-    mocker.patch("firebase_admin.auth.set_custom_user_claims")
+    mocker.patch("services.firebase_service.set_custom_user_claims")
     async with test_client as client:
         response = await client.put(
             "/user/new",
@@ -24,7 +24,7 @@ async def test_create_new_user(
 async def test_create_new_user_failed(
     test_client: AsyncClient, test_user: User, mocker: MockerFixture
 ) -> None:
-    mocker.patch("firebase_admin.auth.set_custom_user_claims")
+    mocker.patch("services.firebase_service.set_custom_user_claims")
     async with test_client as client:
         response = await client.put(
             "/user/new",

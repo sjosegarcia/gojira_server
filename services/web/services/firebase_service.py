@@ -1,10 +1,24 @@
 # mypy: ignore-errors
 from fastapi.param_functions import Header, Security
 from crud.user_crud import get_user_by_uid
-from firebase_admin import credentials, exceptions, auth, initialize_app
+from firebase_admin import initialize_app, delete_app
+from firebase_admin.credentials import Certificate
+from firebase_admin.exceptions import FirebaseError
+
+from firebase_admin.auth import (
+    get_user,
+    delete_user,
+    verify_id_token,
+    set_custom_user_claims,
+    UserNotFoundError,
+    RevokedIdTokenError,
+    InvalidIdTokenError,
+    UserRecord,
+    create_session_cookie,
+)
+
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from setup.config import get_settings
-from firebase_admin.auth import UserNotFoundError, UserRecord
 from datetime import timedelta, datetime
 from time import time
 from fastapi.responses import ORJSONResponse
@@ -15,14 +29,21 @@ from services.database_service import db
 from fastapi.security import SecurityScopes
 
 
+def get_credentials() -> Certificate:
+    return Certificate(get_settings().gcp_service_account_key_path)
+
+
 def init_sdk_with_service_account() -> None:
-    cred = credentials.Certificate(get_settings().gcp_service_account_key_path)
-    initialize_app(cred)
+    initialize_app(get_credentials())
+
+
+def remove_sdk_with_service_account() -> None:
+    delete_app(get_credentials())
 
 
 def get_user(uid: str) -> UserRecord:
     try:
-        return auth.get_user(uid)
+        return get_user(uid)
     except UserNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -32,7 +53,7 @@ def get_user(uid: str) -> UserRecord:
 
 def delete_user(uid: str) -> None:
     try:
-        auth.delete_user(uid)
+        delete_user(uid)
     except UserNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -42,14 +63,14 @@ def delete_user(uid: str) -> None:
 
 def verify_id_token(id_token: str) -> dict:
     try:
-        decoded_token = auth.verify_id_token(id_token, check_revoked=True)
-    except auth.RevokedIdTokenError:
+        decoded_token = verify_id_token(id_token, check_revoked=True)
+    except RevokedIdTokenError:
         # Token revoked, inform the user to reauthenticate or signOut().
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token has been revoked, please sign out and try again.",
         )
-    except auth.InvalidIdTokenError:
+    except InvalidIdTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid Token.",
@@ -58,13 +79,13 @@ def verify_id_token(id_token: str) -> dict:
 
 
 def apply_custom_claim(uid: str, claims: dict) -> None:
-    # try:
-    auth.set_custom_user_claims(uid, claims)
-    # except UserNotFoundError:
-    #    raise HTTPException(
-    #        status_code=status.HTTP_401_UNAUTHORIZED,
-    #        detail="Could not apply claim, User ID could not be found.",
-    #    )
+    try:
+        set_custom_user_claims(uid, claims)
+    except UserNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not apply claim, User ID could not be found.",
+        )
 
 
 def add_scope(uid: str, new_scope: str) -> bool:
@@ -84,12 +105,12 @@ def check_auth_time(id_token: str) -> ORJSONResponse:
     # To ensure that cookies are set only on recently signed in users, check auth_time in
     # ID token before creating a cookie.
     try:
-        decoded_claims = auth.verify_id_token(id_token)
+        decoded_claims = verify_id_token(id_token)
         # Only process if the user signed in within the last 5 minutes.
         if time() - decoded_claims["auth_time"] < 5 * 60:
             expires_in = timedelta(days=5)
             expires = datetime.now() + expires_in
-            session_cookie = auth.create_session_cookie(id_token, expires_in=expires_in)
+            session_cookie = create_session_cookie(id_token, expires_in=expires_in)
             response = ORJSONResponse({"status": "success"})
             response.set_cookie(
                 "session",
@@ -102,11 +123,11 @@ def check_auth_time(id_token: str) -> ORJSONResponse:
         # User did not sign in recently. To guard against ID token theft, require
         # re-authentication.
         # raise HTTPException(status_code=401, detail="Need to sign in again")
-    except auth.InvalidIdTokenError:
+    except InvalidIdTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid ID token"
         )
-    except exceptions.FirebaseError:
+    except FirebaseError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Failed to create a session cookie",
@@ -136,7 +157,7 @@ async def get_current_user(
                 detail="Could not grab id token",
             )
         decoded_token = verify_id_token(id_token)
-    except (auth.RevokedIdTokenError, auth.InvalidIdTokenError):
+    except (RevokedIdTokenError, InvalidIdTokenError):
         raise credentials_exception
     user_in_db = await get_user_by_uid(db, decoded_token["uid"])
     if user_in_db is None:

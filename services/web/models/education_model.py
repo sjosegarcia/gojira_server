@@ -1,12 +1,12 @@
 from models.base import Base
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import DateTime, Integer, String
+from sqlalchemy.sql.sqltypes import DateTime, Integer, String, BigInteger
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 
 class Program(Base):
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False, unique=True)
     slug = Column(String, nullable=False, unique=True)
     courses = relationship("Course", backref="program", lazy="immediate")
@@ -22,7 +22,7 @@ class Program(Base):
 
 
 class Course(Base):
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False, unique=True)
     slug = Column(String, nullable=False, unique=True)
     program_id = Column(Integer, ForeignKey("program.id"))
@@ -41,7 +41,7 @@ class Course(Base):
 
 
 class Lesson(Base):
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False, unique=True)
     slug = Column(String, nullable=False, unique=True)
     course_id = Column(Integer, ForeignKey("course.id"))
@@ -60,7 +60,7 @@ class Lesson(Base):
 
 
 class Section(Base):
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False, unique=True)
     slug = Column(String, nullable=False, unique=True)
     body = Column(String, nullable=True)

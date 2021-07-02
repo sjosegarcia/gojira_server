@@ -1,10 +1,10 @@
 from models.base import Base
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Integer, Boolean
+from sqlalchemy import Column, String, DateTime, BigInteger, Boolean
 
 
 class User(Base):
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     uid = Column(String, nullable=True)
     username = Column(String, nullable=True, unique=True)
     email = Column(String, nullable=True, unique=True)

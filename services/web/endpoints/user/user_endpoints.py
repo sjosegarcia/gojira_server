@@ -22,7 +22,9 @@ async def create_new_user(
     data = await request.json()
     user_found = await get_user_by_email(db, data["email"])
     if user_found:
-        raise HTTPException(status_code=400, detail="User already exist.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User already exist."
+        )
     new_user_schema = User(
         uid=data.get("uid", None),
         username=data.get("username", None),
