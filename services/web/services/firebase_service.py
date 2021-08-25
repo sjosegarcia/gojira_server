@@ -1,7 +1,7 @@
 # mypy: ignore-errors
 from fastapi.param_functions import Header, Security
 from crud.user_crud import get_user_by_uid
-from firebase_admin import initialize_app, delete_app
+from firebase_admin import App, initialize_app, delete_app
 from firebase_admin.credentials import Certificate
 from firebase_admin.exceptions import FirebaseError
 
@@ -37,8 +37,8 @@ def init_sdk_with_service_account() -> None:
     initialize_app(get_credentials())
 
 
-def remove_sdk_with_service_account() -> None:
-    delete_app(get_credentials())
+def remove_sdk_with_service_account(app: App) -> None:
+    delete_app(app)
 
 
 def get_user(uid: str) -> UserRecord:
@@ -61,7 +61,7 @@ def delete_user(uid: str) -> None:
         )
 
 
-def verify_id_token(id_token: str) -> dict:
+def _verify_id_token(id_token: str) -> dict:
     try:
         decoded_token = verify_id_token(id_token, check_revoked=True)
     except RevokedIdTokenError:
@@ -105,7 +105,7 @@ def check_auth_time(id_token: str) -> ORJSONResponse:
     # To ensure that cookies are set only on recently signed in users, check auth_time in
     # ID token before creating a cookie.
     try:
-        decoded_claims = verify_id_token(id_token)
+        decoded_claims = _verify_id_token(id_token)
         # Only process if the user signed in within the last 5 minutes.
         if time() - decoded_claims["auth_time"] < 5 * 60:
             expires_in = timedelta(days=5)
@@ -140,6 +140,7 @@ async def get_current_user(
     authorization: str = Header(None),
     db: AsyncSession = Depends(db.get_db),
 ) -> UserInDB:
+
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
     else:
@@ -156,7 +157,7 @@ async def get_current_user(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not grab id token",
             )
-        decoded_token = verify_id_token(id_token)
+        decoded_token = _verify_id_token(id_token)
     except (RevokedIdTokenError, InvalidIdTokenError):
         raise credentials_exception
     user_in_db = await get_user_by_uid(db, decoded_token["uid"])

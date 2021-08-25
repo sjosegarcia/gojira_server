@@ -3,6 +3,11 @@ from pydantic import BaseModel
 from pydantic.json import pydantic_encoder
 from typing import Any, Callable
 from uuid import UUID
+from humps import camelize
+
+
+def to_camel(string: str) -> Any:
+    return camelize(string)
 
 
 def orjson_dumps(value: Any, *, default: Callable) -> str:
@@ -17,6 +22,7 @@ class Model(BaseModel):
         https://pydantic-docs.helpmanual.io/usage/model_config/
         """
 
+        alias_generator = to_camel
         allow_none = True
         allow_population_by_field_name = True
         anystr_strip_whitespace = True

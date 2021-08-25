@@ -31,7 +31,7 @@ def start_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    init_sdk_with_service_account()
+    app.firebase_app = init_sdk_with_service_account()
 
     @app.on_event("startup")
     async def startup() -> None:
@@ -40,6 +40,6 @@ def start_app() -> FastAPI:
 
     @app.on_event("shutdown")
     async def shutdown() -> None:
-        remove_sdk_with_service_account()
+        remove_sdk_with_service_account(app.firebase_app)
 
     return app

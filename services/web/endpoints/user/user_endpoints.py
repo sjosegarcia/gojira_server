@@ -38,6 +38,10 @@ async def create_new_user(
     )
     new_user = await create_user(db, new_user_schema)
     user_in_db = UserInDB.from_orm(new_user)
+    if not user_in_db.uid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User not created."
+        )
     apply_custom_claim(user_in_db.uid, {"scopes": ["me"]})
     return user_in_db
 
@@ -54,13 +58,31 @@ async def get_user_id(user_id: int, db: AsyncSession = Depends(db.get_db)) -> Us
 
 @users_router.post("/me/update", response_model=UserInDB)
 async def update_user(
-    request: Request, current_user: UserInDB = Depends(get_current_active_user)
+    request: Request,
+    db: AsyncSession = Depends(db.get_db),
+    current_user: UserInDB = Depends(get_current_active_user),
 ) -> UserInDB:
     data = await request.json()
-    print(current_user.dict())
-    new_user = current_user.copy(update=data)
-    print(new_user.dict())
-    return new_user
+    user_found = await get_user_by_id(db, current_user.id)
+    if not user_found:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User not found."
+        )
+    email = data.get("email", None)
+    if email:
+        user_found.email = email
+    firstname = data.get("firstname", None)
+    if firstname:
+        user_found.firstname = firstname
+    lastname = data.get("lastname", None)
+    if lastname:
+        user_found.lastname = data["lastname"]
+    username = data.get("username", None)
+    if username:
+        user_found.username = username
+    await db.commit()
+    db.refresh(user_found)
+    return UserInDB.from_orm(user_found)
 
 
 @users_router.delete("/me/delete", response_model=UserInDB)
