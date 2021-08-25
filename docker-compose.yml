@@ -12,7 +12,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./services/db:/app/db
+      - ./services/db:/app/db/:cached
     restart: always
   api-test-db:
     container_name: goji-test-db
@@ -41,7 +41,7 @@ services:
     environment:
       - REDIS_REPLICATION_MODE=master
     volumes:
-      - ./services/redis:/var/lib/redis
+      - ./services/redis:/var/lib/redis/:cached
     command: redis-server --requirepass Y3YjCB-YZJwi
     ports:
      - "6379:6379"
@@ -55,7 +55,7 @@ services:
       context: './services/web/'
       dockerfile: Dockerfile
     volumes:
-      - ./services/web:/app/web
+      - ./services/web:/app/web/:cached
     env_file:
       - ./services/web/.env
     ports:
