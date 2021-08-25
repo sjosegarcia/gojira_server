@@ -76,7 +76,7 @@ async def update_user(
         user_found.firstname = firstname
     lastname = data.get("lastname", None)
     if lastname:
-        user_found.lastname = data["lastname"]
+        user_found.lastname = lastname
     username = data.get("username", None)
     if username:
         user_found.username = username
