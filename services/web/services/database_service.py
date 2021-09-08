@@ -39,7 +39,7 @@ def create_db_url() -> str:
     env = os.getenv("ENV", "")
     if env == "DEV":
         return settings.database_url
-    if os.getenv("ENV", "") == "TEST":
+    if env == "TEST":
         return settings.test_database_url
 
     return f"postgresql+asyncpg://{settings.database_username}:{get_db_password()}@/{settings.database_name}?host={settings.database_host}:{settings.database_instance}"
