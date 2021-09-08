@@ -5,7 +5,7 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     class Config:
-        env_file = ".env"
+        env_file = ".env" if os.getenv("ENV", "DEV") == "DEV" else ".env.prod"
         env_file_encoding = "utf-8"
 
     project_path: str = os.path.abspath(os.getcwd())
