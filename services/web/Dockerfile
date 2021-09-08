@@ -9,7 +9,7 @@ ENV PYTHONPATH=$PYTHONPATH:$APP_HOME
 # Copying this separately prevents re-running pip install on every code change.
 COPY Pipfile .
 COPY Pipfile.lock .
-RUN pipenv install --deploy --ignore-pipfile
+RUN pipenv install --deploy --ignore-pipfile --no-cache
 ENV PATH=/root/.local/share/virtualenvs/web-ijJmU-Nl/bin:$PATH
 
 # Copy utility files
