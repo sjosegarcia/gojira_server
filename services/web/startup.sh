@@ -1,6 +1,6 @@
 #!/bin/bash
 alembic upgrade head
-if [ "$PRODUCTION" = true ]; then
+if [ "$ENV" = "PRODUCTION" ]; then
 source .env.prod
 gunicorn setup.start_app:start_app -t 0 -w 1 -k uvicorn.workers.UvicornWorker -b $HOST:$PORT --threads 8 --log-level debug --forwarded-allow-ips="*"
 else
