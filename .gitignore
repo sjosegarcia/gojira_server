@@ -131,4 +131,3 @@ services/.DS_Store
 .gitignore
 .DS_Store
 
-.env.prod
