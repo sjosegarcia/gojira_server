@@ -2,7 +2,7 @@ FROM python:3.9.0
 RUN pip install pipenv
 
 # Create app directory
-ENV APP_HOME /app/web
+ENV APP_HOME /services/web
 WORKDIR $APP_HOME
 ENV PYTHONPATH=$PYTHONPATH:$APP_HOME
 
@@ -23,4 +23,4 @@ RUN chmod +x ./startup.sh
 
 # Copy the rest of the files over
 COPY . .
-CMD ["bash", "/app/web/startup.sh"]
+CMD ["bash", "/services/web/startup.sh"]
