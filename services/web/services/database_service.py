@@ -41,8 +41,9 @@ def create_db_url() -> str:
         return settings.database_url
     if env == "TEST":
         return settings.test_database_url
-
-    return f"{settings.database_url}"  # f"postgresql+asyncpg://{settings.database_username}:{get_db_password()}@/{settings.database_name}?host={settings.database_host}:{settings.database_instance}"
+    db_url = settings.database_url
+    db_url_replaced = db_url.replace("postgresql", "postgresql+asyncpg")
+    return f"{db_url_replaced}"  # f"postgresql+asyncpg://{settings.database_username}:{get_db_password()}@/{settings.database_name}?host={settings.database_host}:{settings.database_instance}"
 
 
 db = DatabaseService()
