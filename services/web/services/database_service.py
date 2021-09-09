@@ -42,7 +42,7 @@ def create_db_url() -> str:
     if env == "TEST":
         return settings.test_database_url
 
-    return f"postgresql+asyncpg://{settings.database_username}:{get_db_password()}@/{settings.database_name}?host={settings.database_host}:{settings.database_instance}"
+    return f"{settings.database_url}"  # f"postgresql+asyncpg://{settings.database_username}:{get_db_password()}@/{settings.database_name}?host={settings.database_host}:{settings.database_instance}"
 
 
 db = DatabaseService()
