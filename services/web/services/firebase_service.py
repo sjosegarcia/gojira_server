@@ -41,9 +41,14 @@ def remove_sdk_with_service_account(app: App) -> None:
     delete_app(app)
 
 
-def get_user(uid: str) -> UserRecord:
+def get_firebase_user(uid: str) -> UserRecord:
     try:
         return get_user(uid)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not a proper UID",
+        )
     except UserNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -89,7 +94,7 @@ def apply_custom_claim(uid: str, claims: dict) -> None:
 
 
 def add_scope(uid: str, new_scope: str) -> bool:
-    user = get_user(uid)
+    user = get_firebase_user(uid)
     claims = dict(user.custom_claims)
     scopes = claims.get("scopes", [])
     if scopes:

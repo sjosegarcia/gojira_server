@@ -1,4 +1,8 @@
-from services.firebase_service import get_current_active_user, apply_custom_claim
+from services.firebase_service import (
+    get_current_active_user,
+    apply_custom_claim,
+    get_firebase_user,
+)
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from services.database_service import db
@@ -25,6 +29,7 @@ async def create_new_user(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User already exist."
         )
+    valid_uid = get_firebase_user(data.get("uid", None))
     new_user_schema = User(
         uid=data.get("uid", None),
         username=data.get("username", None),
