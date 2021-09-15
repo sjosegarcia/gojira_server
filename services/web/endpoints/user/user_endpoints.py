@@ -16,7 +16,6 @@ from crud.user_crud import (
     delete_user,
 )
 from starlette.requests import Request
-from loguru import logger
 
 users_router = APIRouter()
 
@@ -44,13 +43,12 @@ async def create_new_user(
         photo_url=data.get("photo_url", None),
     )
     new_user = await create_user(db, new_user_schema)
+    apply_custom_claim(data.get("uid", None), {"scopes": ["me"]})
     user_in_db = UserInDB.from_orm(new_user)
     if not user_in_db.uid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User not created."
         )
-    logger.info("lets try to apply claim")
-    apply_custom_claim(user_in_db.uid, {"scopes": ["me"]})
     return user_in_db
 
 

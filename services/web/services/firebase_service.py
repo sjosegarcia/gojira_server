@@ -86,9 +86,6 @@ def _verify_id_token(id_token: str) -> dict:
 def apply_custom_claim(uid: str, claims: dict) -> None:
     try:
         set_custom_user_claims(uid, claims)
-        from loguru import logger
-
-        logger.info("memes")
     except UserNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
