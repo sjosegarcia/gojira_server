@@ -12,6 +12,7 @@ from crud.user_crud import (
     create_user,
     get_user_by_email,
     get_user_by_id,
+    get_user_by_uid,
     delete_user,
 )
 from starlette.requests import Request
@@ -29,7 +30,7 @@ async def create_new_user(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User already exist."
         )
-    valid_uid = get_firebase_user(data.get("uid", None))
+    get_firebase_user(data.get("uid", None))
     new_user_schema = User(
         uid=data.get("uid", None),
         username=data.get("username", None),
@@ -54,6 +55,16 @@ async def create_new_user(
 @users_router.get("/id/{user_id}", response_model=UserInDB)
 async def get_user_id(user_id: int, db: AsyncSession = Depends(db.get_db)) -> UserInDB:
     user_found = await get_user_by_id(db, user_id)
+    if not user_found:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User not found."
+        )
+    return UserInDB.from_orm(user_found)
+
+
+@users_router.get("/uid/{uid}", response_model=UserInDB)
+async def get_user_uid(uid: str, db: AsyncSession = Depends(db.get_db)) -> UserInDB:
+    user_found = await get_user_by_uid(db, uid)
     if not user_found:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User not found."
