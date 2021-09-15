@@ -42,8 +42,8 @@ async def create_new_user(
         email_verified=data.get("email_verified", False),
         photo_url=data.get("photo_url", None),
     )
-    new_user = await create_user(db, new_user_schema)
     apply_custom_claim(data.get("uid", None), {"scopes": ["me"]})
+    new_user = await create_user(db, new_user_schema)
     user_in_db = UserInDB.from_orm(new_user)
     if not user_in_db.uid:
         raise HTTPException(
