@@ -51,6 +51,7 @@ services:
       - PORT=8080
       - DEBUG=true
       - DATABASE_URL=postgresql+asyncpg://local:local@api-db:5432/test_db
+      - GCP_SERVICE_ACCOUNT_KEY_PATH=godzilliqa-firebase-adminsdk-45dqv-89b0ef1ef5.json
     build:
       context: './services/web/'
       dockerfile: Dockerfile
