@@ -23,7 +23,7 @@ def start_app() -> FastAPI:
     )
 
     app.include_router(api_router, prefix=settings.api_v1_str)
-    app.add_middleware(SessionMiddleware)  # , secret_key=settings.api_secret_key)
+    # app.add_middleware(SessionMiddleware, secret_key=settings.api_secret_key)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
