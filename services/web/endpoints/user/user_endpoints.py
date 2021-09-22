@@ -97,7 +97,7 @@ async def update_user(
     if username:
         user_found.username = username
     await db.commit()
-    db.refresh(user_found)
+    await db.refresh(user_found)
     return UserInDB.from_orm(user_found)
 
 
