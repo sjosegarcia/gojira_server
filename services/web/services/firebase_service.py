@@ -52,7 +52,7 @@ def get_firebase_user(uid: str) -> UserRecord:
     except UserNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not find user, User ID could not be found.",
+            detail=f"Could not find user, User ID could not be found. {get_settings().gcp_service_account_key_path}",
         )
 
 
